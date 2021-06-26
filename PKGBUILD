@@ -2,7 +2,7 @@
 
 pkgbase=linux-amd-s0ix
 pkgver=5.12.13.arch1
-pkgrel=1
+pkgrel=2
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
 url="https://git.archlinux.org/linux.git/log/?h=$_srctag"
@@ -23,6 +23,10 @@ source=(
   "5.13-acpi-1of2-turn-off-unused.patch"::"https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git/patch/?id=4b9ee772eaa82188b0eb8e05bdd1707c2a992004"
   # the second patch in this sequence (2of2) was rejected upstream as it causes problems for some Intel machines
   "5.13-acpi-refine-turning-off-unused-power-resources.patch"
+
+  # these commits crash cezanne immediately on suspend; they're already reverted upstream
+  "revert-4cbbe34807938e6e494e535a68d5ff64edac3f20.patch"
+  "revert-1c0b0efd148d5b24c4932ddb3fa03c8edd6097b3.patch"
 
   # s0ix patches for Renoir/Cezanne landing in 5.14; plus a PCI quirk needed for many machines
   "5.14-ACPI-processor-idle-Fix-up-C-state-latency-if-not-ordered.patch"
@@ -54,6 +58,8 @@ sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
             '5af4796400245fec2e84d6e3f847b8896600558aa85f5e9c4706dd50994a9802'
             'f3b2dbdfd01d728ca1f4bc130eb227edd1985c2b2f7470c8a95aa75c6a85da10'
+            'e03b26bbfd6d7a3fffa290346f96e6f4376e09ac3a76bc658eaab0cd8b486ddd'
+            '3cff17ff6953eef7c17d066d56e510713f2692efac90c61b748d9d38b318f5c8'
             'b4a563ef30f86b9af0932c00bb3422b95eedbda1ff40a1a725c22a0ae9ab7084'
             'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
             '9e83c46bed9059ba78df6c17a2f7c80a1cdb6efbdf64ec643f68573ede891b95'
