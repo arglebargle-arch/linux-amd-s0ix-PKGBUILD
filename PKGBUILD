@@ -1,11 +1,13 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-amd-s0ix
-pkgver=5.12.13.arch1
-pkgrel=2
+pkgver=5.12.13.notarch1
+_tagver=5.12.13.arch1
+pkgrel=3
 pkgdesc='Linux'
-_srctag=v${pkgver%.*}-${pkgver##*.}
-url="https://git.archlinux.org/linux.git/log/?h=$_srctag"
+#_srctag=v${pkgver%.*}-${pkgver##*.}
+_srctag=v${_tagver%.*}-${_tagver##*.}
+url="https://github.com/archlinux/linux/commits/$_srctag"
 arch=(x86_64)
 license=(GPL2)
 makedepends=(
@@ -17,9 +19,17 @@ makedepends=(
 options=('!strip')
 _srcname=archlinux-linux
 source=(
-  "$_srcname::git+https://git.archlinux.org/linux.git?signed#tag=$_srctag"
+  # NOTE: Be sure to change to the new repo url in your arch-linux/config *before* running makepkg
+  #
+  #   url = https://git.archlinux.org/linux.git
+
+  "$_srcname::git+https://github.com/archlinux/linux.git?signed#tag=$_srctag"
   config         # the main kernel config file
 
+  # revert broken 5.12.13.arch1 commits back to 5.12.13 upstream-ish (include ZEN disallow unprivileged CLONE_NEWUSER)
+  "revert-5.12.13.arch1-to-upstream-5.12.13ish.patch"
+
+  # early 5.13 ACPI code for power saving
   "5.13-acpi-1of2-turn-off-unused.patch"::"https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git/patch/?id=4b9ee772eaa82188b0eb8e05bdd1707c2a992004"
   # the second patch in this sequence (2of2) was rejected upstream as it causes problems for some Intel machines
   "5.13-acpi-refine-turning-off-unused-power-resources.patch"
@@ -56,6 +66,7 @@ validpgpkeys=(
 )
 sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
+            '05f47255831028b9e3a49e335323169d0156201d5e9b2bf8e09093440ab9e56e'
             '5af4796400245fec2e84d6e3f847b8896600558aa85f5e9c4706dd50994a9802'
             'f3b2dbdfd01d728ca1f4bc130eb227edd1985c2b2f7470c8a95aa75c6a85da10'
             'e03b26bbfd6d7a3fffa290346f96e6f4376e09ac3a76bc658eaab0cd8b486ddd'
