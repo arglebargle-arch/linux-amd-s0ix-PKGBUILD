@@ -1,0 +1,7 @@
+src-cache/
+src/
+buildlog*
+*log
+.SRCINFO
+*.tar.zst
+*.tar.lz
