@@ -98,7 +98,7 @@ prepare() {
 
   echo "Setting version..."
   scripts/setlocalversion --save-scmversion
-  echo "-$pkgrel" > localversion.10-pkgrel
+  echo "-$pkgrel" > localversion.99-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
 
   local src
