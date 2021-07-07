@@ -1,13 +1,13 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-amd-s0ix
-pkgver=5.12.14.arch1
-#pkgver=5.12.14.notarch1
-#_tagver=5.12.14.arch1
+#pkgver=5.12.14.arch1
+pkgver=5.12.14.arch1+feature1
+_tagver=5.12.14.arch1
 pkgrel=1
 pkgdesc='Linux'
-_srctag=v${pkgver%.*}-${pkgver##*.}
-#_srctag=v${_tagver%.*}-${_tagver##*.}
+#_srctag=v${pkgver%.*}-${pkgver##*.}
+_srctag=v${_tagver%.*}-${_tagver##*.}
 url="https://github.com/archlinux/linux/commits/$_srctag"
 arch=(x86_64)
 license=(GPL2)
@@ -16,6 +16,7 @@ makedepends=(
   xmlto
   # python-sphinx python-sphinx_rtd_theme graphviz imagemagick
   git
+  "gcc>=11.0"
 )
 options=('!strip')
 _srcname=archlinux-linux
@@ -24,6 +25,10 @@ source=(
   #   url = https://git.archlinux.org/linux.git
   "$_srcname::git+https://github.com/archlinux/linux.git?signed#tag=$_srctag"
   config         # the main kernel config file
+
+  # graysky's uarch optimization patch
+  "choose-gcc-optimization.sh"
+  "more-uarches-for-kernel-5.8+.patch"::"https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/a8d200f422f4b2abeaa6cfcfa37136b308e6e33e/more-uarches-for-kernel-5.8%2B.patch"
 
   # early 5.13 ACPI code for power saving
   #"5.13-acpi-refine-turning-off-unused-power-resources.patch"
@@ -51,6 +56,8 @@ validpgpkeys=(
 )
 sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
+            '1ac18cad2578df4a70f9346f7c6fccbb62f042a0ee0594817fdef9f2704904ee'
+            'fa6cee9527d8e963d3398085d1862edc509a52e4540baec463edb8a9dd95bee0'
             'e4cbedbcf939961af425135bb208266c726178c4017309719341f8c37f65c273'
             'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
             'b108959c4a53d771eb2d860a7d52b4a6701e0af9405bef325905c0e273b4d4fe'
@@ -61,6 +68,11 @@ sha256sums=('SKIP'
             '32bbcde83406810f41c9ed61206a7596eb43707a912ec9d870fd94f160d247c1'
             'ee5fdeacb2d8059bc119d6990c0bd68c3c4f7f5b29c9b4a8b2140e9465dd43d5'
             'd46d3562b95c4f679386e7f3209babd335c7a2b599a1196bd8c50bccedd644be')
+
+# 14, Zen2; 15, Zen3; 38, Skylake (Comet Lake laptops); 93, x86-64-v3 (package default); 98, Intel Native; 99, AMD Native
+if [ -z ${_microarchitecture+x} ]; then
+  _microarchitecture=93
+fi
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -85,7 +97,11 @@ prepare() {
 
   echo "Setting config..."
   cp ../config .config
+
   make olddefconfig
+
+  # let user choose microarchitecture optimization in GCC
+  sh ${srcdir}/choose-gcc-optimization.sh $_microarchitecture
 
   make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
