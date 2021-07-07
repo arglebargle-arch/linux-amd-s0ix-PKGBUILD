@@ -2,7 +2,7 @@
 
 pkgbase=linux-amd-s0ix
 #pkgver=5.12.14.arch1
-pkgver=5.12.14.arch1+feature1
+pkgver=5.12.14.arch1+feature2
 _tagver=5.12.14.arch1
 pkgrel=1
 pkgdesc='Linux'
@@ -31,7 +31,7 @@ source=(
   "more-uarches-for-kernel-5.8+.patch"::"https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/a8d200f422f4b2abeaa6cfcfa37136b308e6e33e/more-uarches-for-kernel-5.8%2B.patch"
 
   # early 5.13 ACPI code for power saving
-  #"5.13-acpi-refine-turning-off-unused-power-resources.patch"
+  "5.13-acpi-refine-turning-off-unused-power-resources.patch"
 
   # s0ix patches for Renoir/Cezanne landing in 5.14; plus a PCI quirk needed for many machines
   "backport-from-5.14-s0ix-enablement-no-d3hot.diff"
@@ -58,6 +58,7 @@ sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
             '1ac18cad2578df4a70f9346f7c6fccbb62f042a0ee0594817fdef9f2704904ee'
             'fa6cee9527d8e963d3398085d1862edc509a52e4540baec463edb8a9dd95bee0'
+            '2538941e760cb0ff8e197a46695f6709b7520f0617fb565e5d2d5d28fe125afe'
             'e4cbedbcf939961af425135bb208266c726178c4017309719341f8c37f65c273'
             'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
             'b108959c4a53d771eb2d860a7d52b4a6701e0af9405bef325905c0e273b4d4fe'
