@@ -2,7 +2,7 @@
 
 pkgbase=linux-amd-s0ix
 #pkgver=5.12.14.arch1
-pkgver=5.12.14.arch1+feature2
+pkgver=5.12.14.arch1+feature3
 _tagver=5.12.14.arch1
 pkgrel=1
 pkgdesc='Linux'
@@ -35,6 +35,7 @@ source=(
 
   # s0ix patches for Renoir/Cezanne landing in 5.14; plus a PCI quirk needed for many machines
   "backport-from-5.14-s0ix-enablement-no-d3hot.diff"
+  "ACPI-PM-Only-mark-EC-GPE-for-wakeup-on-Intel-systems.patch"
   "PCI-quirks-Quirk-PCI-d3hot-delay-for-AMD-xhci.patch"
   # diagnostic patches to allow debugging time spent in s0ix states
   "v5-platform-x86-amd-pmc-s0ix+smu-counters.diff"
@@ -60,6 +61,7 @@ sha256sums=('SKIP'
             'fa6cee9527d8e963d3398085d1862edc509a52e4540baec463edb8a9dd95bee0'
             '2538941e760cb0ff8e197a46695f6709b7520f0617fb565e5d2d5d28fe125afe'
             'e4cbedbcf939961af425135bb208266c726178c4017309719341f8c37f65c273'
+            '30c3ebf86e6b70ca9e35b5b9bcf39a3b3d14cb9ca18b261016b7d02ed37a0c4b'
             'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
             'b108959c4a53d771eb2d860a7d52b4a6701e0af9405bef325905c0e273b4d4fe'
             '09cf9fa947e58aacf25ff5c36854b82d97ad8bda166a7e00d0f3f4df7f60a695'
