@@ -1,9 +1,13 @@
+#
+# Maintainer: Arglebargle <arglebargle AT arglebargle DOT dev>
+#
+# Based on the linux package by:
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-amd-s0ix
 #pkgver=5.12.14.arch1
-pkgver=5.12.14.arch1+feature3
-_tagver=5.12.14.arch1
+pkgver=5.12.15.notarch1
+_tagver=5.12.15.arch1
 pkgrel=1
 pkgdesc='Linux'
 #_srctag=v${pkgver%.*}-${pkgver##*.}
@@ -21,24 +25,22 @@ makedepends=(
 options=('!strip')
 _srcname=archlinux-linux
 source=(
-  # NOTE: Be sure to change to the new repo url in your arch-linux/config *before* running makepkg
-  #   url = https://git.archlinux.org/linux.git
   "$_srcname::git+https://github.com/archlinux/linux.git?signed#tag=$_srctag"
   config         # the main kernel config file
-
   # graysky's uarch optimization patch
   "choose-gcc-optimization.sh"
   "more-uarches-for-kernel-5.8+.patch"::"https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/a8d200f422f4b2abeaa6cfcfa37136b308e6e33e/more-uarches-for-kernel-5.8%2B.patch"
 
-  # early 5.13 ACPI code for power saving
-  "5.13-acpi-refine-turning-off-unused-power-resources.patch"
+  # revert <=1MB memory reservation; not sure why this crashes my machine on suspend but it does
+  "revert-1MB-unconditional-memory-reservation.patch"
 
-  # s0ix patches for Renoir/Cezanne landing in 5.14; plus a PCI quirk needed for many machines
-  "backport-from-5.14-s0ix-enablement-no-d3hot.diff"
-  "ACPI-PM-Only-mark-EC-GPE-for-wakeup-on-Intel-systems.patch"
+  # early 5.13 ACPI code for power saving
+  "backport-from-5.13-acpi-turn-off-unused+refined.diff"
+
+  # backported s0ix enablement patches through 2021-06-30, includes v5 amd_pmc patch series & EC GPE patch
+  "backport-from-5.14-s0ix-enablement-no-d3hot-2021-06-30.patch"
   "PCI-quirks-Quirk-PCI-d3hot-delay-for-AMD-xhci.patch"
-  # diagnostic patches to allow debugging time spent in s0ix states
-  "v5-platform-x86-amd-pmc-s0ix+smu-counters.diff"
+
   # ROG enablement patches
   "0001-asus-wmi-Add-panel-overdrive-functionality.patch"
   "0002-asus-wmi-Add-dgpu-disable-method.patch"
@@ -59,11 +61,10 @@ sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
             '1ac18cad2578df4a70f9346f7c6fccbb62f042a0ee0594817fdef9f2704904ee'
             'fa6cee9527d8e963d3398085d1862edc509a52e4540baec463edb8a9dd95bee0'
+            '05f47255831028b9e3a49e335323169d0156201d5e9b2bf8e09093440ab9e56e'
             '2538941e760cb0ff8e197a46695f6709b7520f0617fb565e5d2d5d28fe125afe'
-            'e4cbedbcf939961af425135bb208266c726178c4017309719341f8c37f65c273'
-            '30c3ebf86e6b70ca9e35b5b9bcf39a3b3d14cb9ca18b261016b7d02ed37a0c4b'
+            'ea96d0cc98ba34396a100f0afc10e392c60415f08c4b1ddfd99f2ca532d5ac12'
             'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
-            'b108959c4a53d771eb2d860a7d52b4a6701e0af9405bef325905c0e273b4d4fe'
             '09cf9fa947e58aacf25ff5c36854b82d97ad8bda166a7e00d0f3f4df7f60a695'
             '7a685e2e2889af744618a95ef49593463cd7e12ae323f964476ee9564c208b77'
             '663b664f4a138ccca6c4edcefde6a045b79a629d3b721bfa7b9cc115f704456e'
