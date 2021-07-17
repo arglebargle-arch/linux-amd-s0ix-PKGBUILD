@@ -1,29 +1,36 @@
-From 42b2e2ffb3a9e421050893c8a3786210fb541ae1 Mon Sep 17 00:00:00 2001
+From 4099d332697bdc64ae863bf92a820f66d11ec9d3 Mon Sep 17 00:00:00 2001
 From: Scott B <28817345+foundObjects@users.noreply.github.com>
-Date: Thu, 8 Jul 2021 03:24:48 -0700
-Subject: [PATCH] Squashed commit of the following:
+Date: Fri, 16 Jul 2021 15:25:29 -0700
+Subject: [PATCH] v5.13.1-s0ix patch 2021-07-14
 
-all mainline s0ix support up to 2021-06-30:
-    11 s0ix patches, including EC GPE patch
-    7 amd_pmc v5 patchset diagnostics
+Squashed commit of the following:
 
-Does not include AMD XHCI D3hot Quirk
+commit 8e592b36329bce7c3c547d2fc0caf47bc6df4c9b
+Author: Marcin Bachry <hegel666@gmail.com>
+Date:   Tue Mar 16 15:28:51 2021 -0400
 
-commit 2b513555a462fc9233355d44789833a9be300a2f
-Merge: ebf1d8bcad36 b072ea5d76db
-Author: Scott B <28817345+foundObjects@users.noreply.github.com>
-Date:   Thu Jul 8 03:16:14 2021 -0700
+    PCI: quirks: Quirk PCI d3hot delay for AMD xhci
 
-    Merge branch 'patchwork-amd-pmc-logging-v5' into TEMP-s0ix-on-5.13
+    Renoir needs a similar delay.
 
-commit ebf1d8bcad366f451d54bda9e15943f173003551
-Merge: 62fb9874f5da 35f01a4422b1
-Author: Scott B <28817345+foundObjects@users.noreply.github.com>
-Date:   Thu Jul 8 03:15:32 2021 -0700
+    Signed-off-by: Marcin Bachry <hegel666@gmail.com>
+    Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
 
-    Merge branch 'DO-NOT-USE-backport-from-5.14-s0ix-no-d3hot' into HEAD
+commit b858371975804bd31215feffaf4eac9d6e5b1977
+Author: Mario Limonciello <mario.limonciello@amd.com>
+Date:   Wed Jul 7 09:16:47 2021 -0500
 
-commit 35f01a4422b180806c6106b5696ab9626b5dac41
+    platform/x86: amd-pmc: Use return code on suspend
+
+    Right now the driver will still return success even if the OS_HINT
+    command failed to send to the SMU. In the rare event of a failure,
+    the suspend should really be aborted here so that relevant logs
+    can may be captured.
+
+    Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+    Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+
+commit c01fc5b4966e41e5a3601e5994bbadcfd7c3b8a8
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Wed Jun 30 14:46:06 2021 -0500
 
@@ -64,7 +71,118 @@ Date:   Wed Jun 30 14:46:06 2021 -0500
     Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
     Acked-by: Alex Deucher <alexander.deucher@amd.com>
 
-commit 5032c30b7d44b5b9d68f7a8d3bbcb6238484b2a6
+commit 7a71407032a5f499dcbb96adf50334329b5af236
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:18:03 2021 +0530
+
+    platform/x86: amd-pmc: Add new acpi id for future PMC controllers
+
+    The upcoming PMC controller would have a newer acpi id, add that to
+    the supported acpid device list.
+
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit b86e2cc606d916f0f77205500d4abc1925623fda
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:18:02 2021 +0530
+
+    platform/x86: amd-pmc: Add support for ACPI ID AMDI0006
+
+    Some newer BIOSes have added another ACPI ID for the uPEP device.
+    SMU statistics behave identically on this device.
+
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 4c6dc5644d77b31c8b5b25ca3fede7137ce54072
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:18:01 2021 +0530
+
+    amd-pmc: Add support for logging s0ix counters
+
+    Even the FCH SSC registers provides certain level of information
+    about the s0ix entry and exit times which comes handy when the SMU
+    fails to report the statistics via the mailbox communication.
+
+    This information is captured via a new debugfs file "s0ix_stats".
+    A non-zero entry in this counters would mean that the system entered
+    the s0ix state.
+
+    If s0ix entry time and exit time don't change during suspend to idle,
+    the silicon has not entered the deepest state.
+
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 5c516962b687f56a7c2271777e1c644b4173441d
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:18:00 2021 +0530
+
+    platform/x86: amd-pmc: Add support for logging SMU metrics
+
+    SMU provides a way to dump the s0ix debug statistics in the form of a
+    metrics table via a of set special mailbox commands.
+
+    Add support to the driver which can send these commands to SMU and expose
+    the information received via debugfs. The information contains the s0ix
+    entry/exit, active time of each IP block etc.
+
+    As a side note, SMU subsystem logging is not supported on Picasso based
+    SoC's.
+
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit bc7f4c05175ddbeb4605ce24d8bcb141ad501726
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:17:59 2021 +0530
+
+    platform/x86: amd-pmc: call dump registers only once
+
+    Currently amd_pmc_dump_registers() routine is being called at
+    multiple places. The best to call it is after command submission
+    to SMU.
+
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+
+commit 017125eb2aab354cda19a40e8950c4d5c7a64629
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:17:58 2021 +0530
+
+    platform/x86: amd-pmc: Fix SMU firmware reporting mechanism
+
+    It was lately understood that the current mechanism available in the
+    driver to get SMU firmware info works only on internal SMU builds and
+    there is a separate way to get all the SMU logging counters (addressed
+    in the next patch). Hence remove all the smu info shown via debugfs as it
+    is no more useful.
+
+    Fixes: 156ec4731cb2 ("platform/x86: amd-pmc: Add AMD platform support for S2Idle")
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+
+commit c0eb3565ed21392a4b6c3b909a6766ceff293134
+Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Date:   Tue Jun 29 14:17:57 2021 +0530
+
+    platform/x86: amd-pmc: Fix command completion code
+
+    The protocol to submit a job request to SMU is to wait for
+    AMD_PMC_REGISTER_RESPONSE to return 1,meaning SMU is ready to take
+    requests. PMC driver has to make sure that the response code is always
+    AMD_PMC_RESULT_OK before making any command submissions.
+
+    When we submit a message to SMU, we have to wait until it processes
+    the request. Adding a read_poll_timeout() check as this was missing in
+    the existing code.
+
+    Also, add a mutex to protect amd_pmc_send_cmd() calls to SMU.
+
+    Fixes: 156ec4731cb2 ("platform/x86: amd-pmc: Add AMD platform support for S2Idle")
+    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+    Acked-by: Raul E Rangel <rrangel@chromium.org>
+
+commit e7a643dec34e388db2381dc6dcfec2333fd62a82
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Thu Jun 17 11:42:12 2021 -0500
 
@@ -80,7 +198,7 @@ Date:   Thu Jun 17 11:42:12 2021 -0500
 
     Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 
-commit 6ad8efa21132a0c53372a615c91f5f24b6e2ed63
+commit 8a2ed69832b5ff456bc643ef096431e57dbd518e
 Author: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 Date:   Thu Jun 17 11:42:11 2021 -0500
 
@@ -94,7 +212,7 @@ Date:   Thu Jun 17 11:42:11 2021 -0500
     Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
     Signed-off-by: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 
-commit 1c22e7dec26ea42a98b0c87d97a150a415978ec1
+commit df3908dc58bd552953ddb5ea4a82fc9570bd5de7
 Author: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 Date:   Thu Jun 17 11:42:10 2021 -0500
 
@@ -105,7 +223,7 @@ Date:   Thu Jun 17 11:42:10 2021 -0500
 
     Signed-off-by: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 
-commit aa430a0319ce9ac4629735ac6a5b86bd48517dff
+commit 5b08730e5f66db836c566dea5fbb86e4878d5a13
 Author: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 Date:   Thu Jun 17 11:42:09 2021 -0500
 
@@ -123,7 +241,7 @@ Date:   Thu Jun 17 11:42:09 2021 -0500
     Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
     Signed-off-by: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 
-commit a71e52e9ea22c0b976014a6f7eb2ed93f65aa4ca
+commit 155f6b24376587f69b8a17a8a8ffc3d498410909
 Author: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 Date:   Thu Jun 17 11:42:08 2021 -0500
 
@@ -134,7 +252,7 @@ Date:   Thu Jun 17 11:42:08 2021 -0500
 
     Signed-off-by: Pratik Vishwakarma <Pratik.Vishwakarma@amd.com>
 
-commit e5b15e24f169d15b231581cccb2bfa9820225cff
+commit a3acfd65aac2286c9caeb1d6c6d071bf3d758724
 Author: Alex Deucher <alexander.deucher@amd.com>
 Date:   Wed May 5 09:20:32 2021 -0400
 
@@ -151,7 +269,7 @@ Date:   Wed May 5 09:20:32 2021 -0400
     Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
     Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-commit 526bf2ffedece1257d3742a2ad633e00bb1778a7
+commit 8b4059233e61891ac4a71a1c17f6522a0bbc0eb2
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Wed Jun 9 13:40:18 2021 -0500
 
@@ -198,7 +316,7 @@ Date:   Wed Jun 9 13:40:18 2021 -0500
     Tested-by: Julian Sikorski <belegdol@gmail.com>
     Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-commit 8b763d23606ce256a5ec9db81d8177ad5e90bbf9
+commit 8acca77bfbbd0e50465268d4d0518a862b4f344c
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Wed Jun 9 13:40:17 2021 -0500
 
@@ -220,7 +338,7 @@ Date:   Wed Jun 9 13:40:17 2021 -0500
     Reviewed-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
     Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-commit b12b48eb29c8a392f4093898877a02f271b93355
+commit d86d0556f75b29926f3742dfbd3ba233a4d6f2d2
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Fri May 28 11:02:34 2021 -0500
 
@@ -243,7 +361,7 @@ Date:   Fri May 28 11:02:34 2021 -0500
     Reviewed-by: David E. Box <david.e.box@linux.intel.com>
     Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-commit e54f80e62f9d3412a7add7f3753c7c2604cbfe78
+commit 95241ba42277d37cdeff5ce63dbade2b0ababe2b
 Author: Mario Limonciello <mario.limonciello@amd.com>
 Date:   Wed May 12 17:15:14 2021 -0500
 
@@ -270,117 +388,6 @@ Date:   Wed May 12 17:15:14 2021 -0500
     Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
     [ rjw: Subject and changelog edits ]
     Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-
-commit b072ea5d76db90c1316aa04a15f77744ac1bafa1
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:18:03 2021 +0530
-
-    platform/x86: amd-pmc: Add new acpi id for future PMC controllers
-
-    The upcoming PMC controller would have a newer acpi id, add that to
-    the supported acpid device list.
-
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-commit 4f025bcec084eb0624b3a34a03b0ff00a14a2fa0
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:18:02 2021 +0530
-
-    platform/x86: amd-pmc: Add support for ACPI ID AMDI0006
-
-    Some newer BIOSes have added another ACPI ID for the uPEP device.
-    SMU statistics behave identically on this device.
-
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-commit a3ccb3605aac3f650732a55adea7e666d9df24c5
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:18:01 2021 +0530
-
-    amd-pmc: Add support for logging s0ix counters
-
-    Even the FCH SSC registers provides certain level of information
-    about the s0ix entry and exit times which comes handy when the SMU
-    fails to report the statistics via the mailbox communication.
-
-    This information is captured via a new debugfs file "s0ix_stats".
-    A non-zero entry in this counters would mean that the system entered
-    the s0ix state.
-
-    If s0ix entry time and exit time don't change during suspend to idle,
-    the silicon has not entered the deepest state.
-
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-commit 826b61ec6a7785614435fcdeb951290981eff6f1
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:18:00 2021 +0530
-
-    platform/x86: amd-pmc: Add support for logging SMU metrics
-
-    SMU provides a way to dump the s0ix debug statistics in the form of a
-    metrics table via a of set special mailbox commands.
-
-    Add support to the driver which can send these commands to SMU and expose
-    the information received via debugfs. The information contains the s0ix
-    entry/exit, active time of each IP block etc.
-
-    As a side note, SMU subsystem logging is not supported on Picasso based
-    SoC's.
-
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-commit dd120f506eea9bee584cf0f7d737631554ba17a3
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:17:59 2021 +0530
-
-    platform/x86: amd-pmc: call dump registers only once
-
-    Currently amd_pmc_dump_registers() routine is being called at
-    multiple places. The best to call it is after command submission
-    to SMU.
-
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-
-commit 87390ff9f263e0aa586d9a33198e79b47e5f85d1
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:17:58 2021 +0530
-
-    platform/x86: amd-pmc: Fix SMU firmware reporting mechanism
-
-    It was lately understood that the current mechanism available in the
-    driver to get SMU firmware info works only on internal SMU builds and
-    there is a separate way to get all the SMU logging counters (addressed
-    in the next patch). Hence remove all the smu info shown via debugfs as it
-    is no more useful.
-
-    Fixes: 156ec4731cb2 ("platform/x86: amd-pmc: Add AMD platform support for S2Idle")
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-
-commit 65581db92e5e4d5fa941cc6bb91e702e3ed97b74
-Author: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Date:   Tue Jun 29 14:17:57 2021 +0530
-
-    platform/x86: amd-pmc: Fix command completion code
-
-    The protocol to submit a job request to SMU is to wait for
-    AMD_PMC_REGISTER_RESPONSE to return 1,meaning SMU is ready to take
-    requests. PMC driver has to make sure that the response code is always
-    AMD_PMC_RESULT_OK before making any command submissions.
-
-    When we submit a message to SMU, we have to wait until it processes
-    the request. Adding a read_poll_timeout() check as this was missing in
-    the existing code.
-
-    Also, add a mutex to protect amd_pmc_send_cmd() calls to SMU.
-
-    Fixes: 156ec4731cb2 ("platform/x86: amd-pmc: Add AMD platform support for S2Idle")
-    Signed-off-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-    Acked-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/acpi/device_pm.c       |  32 +++++
  drivers/acpi/internal.h        |   9 ++
@@ -388,9 +395,10 @@ Date:   Tue Jun 29 14:17:57 2021 +0530
  drivers/acpi/x86/s2idle.c      | 157 ++++++++++++++-------
  drivers/acpi/x86/utils.c       |  25 ++++
  drivers/nvme/host/pci.c        |  50 +------
- drivers/platform/x86/amd-pmc.c | 244 ++++++++++++++++++++++++++++++---
+ drivers/pci/quirks.c           |   3 +
+ drivers/platform/x86/amd-pmc.c | 246 ++++++++++++++++++++++++++++++---
  include/linux/acpi.h           |   5 +
- 8 files changed, 443 insertions(+), 119 deletions(-)
+ 9 files changed, 447 insertions(+), 120 deletions(-)
 
 diff --git a/drivers/acpi/device_pm.c b/drivers/acpi/device_pm.c
 index d260bc1f3e6e..6dd9bd64903e 100644
@@ -889,8 +897,22 @@ index a29b170701fc..8fbc4c87a0d8 100644
  		/*
  		 * Some systems use a bios work around to ask for D3 on
  		 * platforms that support kernel managed suspend.
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index 22b2bb1109c9..c4f5e2f093a3 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -1899,6 +1899,9 @@ static void quirk_ryzen_xhci_d3hot(struct pci_dev *dev)
+ }
+ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_AMD, 0x15e0, quirk_ryzen_xhci_d3hot);
+ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_AMD, 0x15e1, quirk_ryzen_xhci_d3hot);
++/* Renoir XHCI requires longer delay when transitioning from D0 to
++ * D3hot */
++DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_AMD, 0x1639, quirk_ryzen_xhci_d3hot);
+ 
+ #ifdef CONFIG_X86_IO_APIC
+ static int dmi_disable_ioapicreroute(const struct dmi_system_id *d)
 diff --git a/drivers/platform/x86/amd-pmc.c b/drivers/platform/x86/amd-pmc.c
-index b9da58ee9b1e..d2f9a62e1166 100644
+index b9da58ee9b1e..680f94c7e075 100644
 --- a/drivers/platform/x86/amd-pmc.c
 +++ b/drivers/platform/x86/amd-pmc.c
 @@ -46,34 +46,79 @@
@@ -1116,7 +1138,7 @@ index b9da58ee9b1e..d2f9a62e1166 100644
  				PMC_MSG_DELAY_MIN_US * RESPONSE_REGISTER_LOOP_MAX);
  	if (rc) {
  		dev_err(dev->dev, "failed to talk to SMU\n");
-@@ -154,21 +285,74 @@ static int amd_pmc_send_cmd(struct amd_pmc_dev *dev, bool set)
+@@ -154,34 +285,91 @@ static int amd_pmc_send_cmd(struct amd_pmc_dev *dev, bool set)
  	amd_pmc_reg_write(dev, AMD_PMC_REGISTER_ARGUMENT, set);
  
  	/* Write message ID to message ID register */
@@ -1192,10 +1214,11 @@ index b9da58ee9b1e..d2f9a62e1166 100644
  		dev_err(pdev->dev, "suspend failed\n");
  
 -	amd_pmc_dump_registers(pdev);
- 	return 0;
+-	return 0;
++	return rc;
  }
  
-@@ -176,12 +360,16 @@ static int __maybe_unused amd_pmc_resume(struct device *dev)
+ static int __maybe_unused amd_pmc_resume(struct device *dev)
  {
  	struct amd_pmc_dev *pdev = dev_get_drvdata(dev);
  	int rc;

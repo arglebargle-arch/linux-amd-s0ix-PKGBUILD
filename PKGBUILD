@@ -7,7 +7,7 @@
 pkgbase=linux-amd-s0ix
 pkgver=5.13.1.arch1
 #_tagver=5.12.15.arch1
-pkgrel=1
+pkgrel=2
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
 #_srctag=v${_tagver%.*}-${_tagver##*.}
@@ -31,11 +31,6 @@ source=(
   "choose-gcc-optimization.sh"
   "more-uarches-for-kernel-5.8+.patch"::"https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/a8d200f422f4b2abeaa6cfcfa37136b308e6e33e/more-uarches-for-kernel-5.8%2B.patch"
 
-  # backported s0ix enablement patches through 2021-06-30, includes v5 amd_pmc patch series & EC GPE patch
-  "backport-from-5.14-s0ix-enablement-no-d3hot-2021-06-30.patch"
-  "platform-x86-amd-pmc-Use-return-code-on-suspend.patch"           # added 2021-07-07
-  "PCI-quirks-Quirk-PCI-d3hot-delay-for-AMD-xhci.patch"             # delayed pending AMD errata
-
   # ROG enablement patches; commented patches are now upstream
   "0001-asus-wmi-Add-panel-overdrive-functionality.patch"
   "0002-asus-wmi-Add-dgpu-disable-method.patch"
@@ -46,6 +41,14 @@ source=(
   "0007-ALSA-hda-realtek-Fix-speakers-not-working-on-Asus-Fl.patch"
   #"0008-ACPI-video-use-native-backlight-for-GA401-GA502-GA50.patch"
   #"0009-Revert-platform-x86-asus-nb-wmi-Drop-duplicate-DMI-q.patch"
+
+  # k10temp support for Zen3 APUs
+  "8001-x86-amd_nb-Add-AMD-family-19h-model-50h-PCI-ids.patch"
+  "8002-hwmon-k10temp-support-Zen3-APUs.patch"
+
+  # squashed s0ix enablement through 2021-07-14; all current patches
+  "9001-v5.13.1-s0ix-patch-2021-07-14.patch"
+  #"9001-v5.13.2-s0ix-patch-2021-07-14.patch"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -56,14 +59,14 @@ sha256sums=('SKIP'
             'ffe1c14930227a0a8e7b19ccf1243a8f119df75f51849edce470b6b96167e2d7'
             '1ac18cad2578df4a70f9346f7c6fccbb62f042a0ee0594817fdef9f2704904ee'
             'fa6cee9527d8e963d3398085d1862edc509a52e4540baec463edb8a9dd95bee0'
-            'ea96d0cc98ba34396a100f0afc10e392c60415f08c4b1ddfd99f2ca532d5ac12'
-            '8825ad8161336d2f08b37b59bfe6c66a3c46e6e7d35dc19122fb92a2c1e4a447'
-            'dab4db308ede1aa35166f31671572eeccf0e7637b3218ce3ae519c2705934f79'
             '09cf9fa947e58aacf25ff5c36854b82d97ad8bda166a7e00d0f3f4df7f60a695'
             '7a685e2e2889af744618a95ef49593463cd7e12ae323f964476ee9564c208b77'
             '663b664f4a138ccca6c4edcefde6a045b79a629d3b721bfa7b9cc115f704456e'
             '034743a640c26deca0a8276fa98634e7eac1328d50798a3454c4662cff97ccc9'
-            '32bbcde83406810f41c9ed61206a7596eb43707a912ec9d870fd94f160d247c1')
+            '32bbcde83406810f41c9ed61206a7596eb43707a912ec9d870fd94f160d247c1'
+            'ed28a8051514f8c228717a5cdd13191b1c58181e0228d972fbe2af5ee1d013d7'
+            'de8c9747637768c4356c06aa65c3f157c526aa420f21fdd5edd0ed06f720a62e'
+            'd256ae6e76b0fc1d1815bbb4cb9d6a08318d1fc6195fc758c7fc4535e5761142')
 
 # 14, Zen2; 15, Zen3; 38, Skylake (Comet Lake laptops); 93, x86-64-v3 (package default); 98, Intel Native; 99, AMD Native
 if [ -z ${_microarchitecture+x} ]; then
